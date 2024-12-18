@@ -1,0 +1,21 @@
+const int soilMoisturePin = A0; // Pin connected to the soil moisture sensor
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(soilMoisturePin, INPUT);
+}
+
+void loop() {
+  // Read soil moisture from the soil moisture sensor
+  int soilMoistureValue = analogRead(soilMoisturePin);
+
+  // Convert the analog reading to a percentage value
+  int soilMoisturePercentage = map(soilMoistureValue, 0, 1023, 0, 100);
+
+  // Print the soil moisture percentage value
+  Serial.print("Soil Moisture: ");
+  Serial.print(soilMoisturePercentage);
+  Serial.println("%");
+
+  delay(2000); // Wait for 2 seconds before taking the next reading
+}

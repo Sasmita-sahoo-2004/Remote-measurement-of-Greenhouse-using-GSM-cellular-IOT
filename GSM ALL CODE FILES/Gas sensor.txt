@@ -1,0 +1,19 @@
+#include <MQ135.h> // Install the MQ135 library from the Arduino Library Manager
+
+const int airQualityPin = A0; // Pin connected to the analog output of the air quality sensor
+
+MQ135 mq135(airQualityPin);
+
+void setup() {
+  Serial.begin(9600); // Initialize serial communication for debugging
+}
+
+void loop() {
+  float airQualityValue = mq135.getPPM(); // Get the air quality value in PPM (Parts Per Million)
+
+  Serial.print("Air Quality: ");
+  Serial.print(airQualityValue);
+  Serial.println(" PPM");
+
+  delay(2000); // Wait for 2 seconds before taking the next reading
+}

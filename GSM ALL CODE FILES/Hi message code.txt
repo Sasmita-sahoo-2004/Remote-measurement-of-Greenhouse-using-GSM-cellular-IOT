@@ -1,0 +1,57 @@
+25/07/23
+CODE FOR SENDING HI MESSAGE THROUGH GSM AND ARDUINO 
+
+
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial sim(9, 10);
+
+void setup() {
+  //Begin serial communication with Arduino and Arduino IDE (Serial Monitor)
+  Serial.begin(9600);
+  //Begin serial communication with Arduino and SIM800L
+  sim.begin(9600);
+  Serial.println("Initializing...");
+  delay(1000);
+  sim.println("AT");  //Once the handshake test is successful, it will back to OK
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CSQ");  //Signal quality test, value range is 0-31 , 31 is the best
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CCID");  //Read SIM information to confirm whether the SIM is plugged
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CREG?");  //Check whether it has registered in the network
+  updateSerial();
+ // Serial.println();
+  sim.println("AT+CMGF=1");  // Configuring TEXT mode
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CMGS=\"+917008779050\"");  //change ZZ with country code and xxxxxxxxxxxwith phone number to sms
+  updateSerial();
+  //Serial.println();
+  sim.print("HELLO swarna MAM");  //text content
+  updateSerial();
+  Serial.println();
+  Serial.println("Message Sent");
+  sim.write(26);
+  updateSerial();
+}
+
+
+void loop() {
+  updateSerial();
+}
+
+
+void updateSerial() {
+  delay(500);
+  while (Serial.available()) {
+    sim.write(Serial.read());  //Forward what Serial received to Software Serial Port
+  }
+  while (sim.available()) {
+    Serial.write(sim.read());  //Forward what Software Serial received to Serial Port
+  }
+} 

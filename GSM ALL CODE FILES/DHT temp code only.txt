@@ -1,0 +1,119 @@
+#include <DHT.h>
+
+#define DHTPIN 2      // Pin connected to the DHT22 sensor
+#define DHTTYPE DHT22 // Type of DHT sensor (DHT22)
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+}
+
+void loop() {
+  // Read temperature and humidity from the DHT sensor
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Check if the readings are valid
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("Failed to read data from DHT sensor!");
+  } else {
+    // Print the sensor readings
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.print("%\tTemperature: ");
+    Serial.print(temperature);
+    Serial.println("°C");
+  }
+
+  delay(2000); // Wait for 2 seconds before taking the next reading
+}
+
+
+
+DHT INTERFACING WITH GSM CODE:
+
+
+#include <SoftwareSerial.h>
+#include <DHT.h>
+
+#define DHTPIN 7          // Pin connected to the DHT11 sensor data pin
+#define DHTTYPE DHT11     // DHT sensor type
+
+SoftwareSerial sim(9, 10);
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  //Begin serial communication with Arduino and Arduino IDE (Serial Monitor)
+  Serial.begin(9600);
+  //Begin serial communication with Arduino and SIM800L
+  sim.begin(9600);
+  dht.begin();    // Initialize DHT11 sensor
+  Serial.println("Initializing...");
+  delay(1000);
+  sim.println("AT");  //Once the handshake test is successful, it will back to OK
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CSQ");  //Signal quality test, value range is 0-31, 31 is the best
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CCID");  //Read SIM information to confirm whether the SIM is plugged
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CREG?");  //Check whether it has registered in the network
+  updateSerial();
+  //Serial.println();
+  sim.println("AT+CMGF=1");  // Configuring TEXT mode
+  updateSerial();
+  //Serial.println();
+
+  // Read temperature from DHT11 sensor and send via SMS
+  float temperature = readTemperature();
+  sendSMS(temperature);
+
+  Serial.println();
+  Serial.println("Message Sent");
+  sim.write(26);
+  updateSerial();
+}
+
+void loop() {
+  // Add other functionalities here if needed
+  updateSerial();
+}
+
+void updateSerial() {
+  delay(500);
+  while (Serial.available()) {
+    sim.write(Serial.read());  //Forward what Serial received to Software Serial Port
+  }
+  while (sim.available()) {
+    Serial.write(sim.read());  //Forward what Software Serial received to Serial Port
+  }
+}
+
+float readTemperature() {
+  // Read temperature from DHT11 sensor
+  float temperature = dht.readTemperature();
+
+  // Check if any valid data was obtained
+  if (isnan(temperature)) {
+    Serial.println("Failed to read temperature from DHT11 sensor!");
+    return 0.0;
+  }
+
+  return temperature;
+}
+
+void sendSMS(float temperature) {
+  // Send SMS with the temperature data
+  sim.println("AT+CMGS=\"+917008779050\"");  // Change with your recipient's phone number
+  updateSerial();
+  sim.print("Temperature: ");
+  sim.print(temperature, 1);  // Send temperature with one decimal place
+  sim.print(" C");
+  sim.write(26);             // End the SMS message with Ctrl+Z
+  updateSerial();
+}
+

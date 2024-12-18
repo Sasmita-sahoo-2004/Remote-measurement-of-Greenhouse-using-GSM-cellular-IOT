@@ -1,0 +1,15 @@
+const int fanPin = 9; // Pin connected to the DC fan
+
+void setup() {
+  pinMode(fanPin, OUTPUT);
+}
+
+void loop() {
+  // Turn ON the fan
+  digitalWrite(fanPin, HIGH);
+  delay(5000); // Fan ON for 5 seconds
+
+  // Turn OFF the fan
+  digitalWrite(fanPin, LOW);
+  delay(5000); // Fan OFF for 5 seconds
+}

@@ -1,0 +1,17 @@
+const int ldrPin = A0; // Pin connected to the LDR sensor
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ldrPin, INPUT);
+}
+
+void loop() {
+  // Read the LDR sensor value
+  int ldrValue = analogRead(ldrPin);
+
+  // Print the LDR sensor value
+  Serial.print("LDR Value: ");
+  Serial.println(ldrValue);
+
+  delay(1000); // Wait for 1 second before taking the next reading
+}
